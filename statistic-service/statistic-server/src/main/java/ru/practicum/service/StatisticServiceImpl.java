@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHit;
 import ru.practicum.dto.ViewStats;
+import ru.practicum.mapper.StatisticMapper;
 import ru.practicum.model.Statistic;
 import ru.practicum.repository.StatisticRepository;
 
@@ -22,28 +23,27 @@ public class StatisticServiceImpl implements StatisticService {
     @Transactional
     @Override
     public void saveHit(EndpointHit hit) {
-//        Statistic stats = STATS_MAPPER.endpointHitToStats(hit);
-//        log.info("Create new hit: {}", stats);
-//        statisticRepository.save(STATS_MAPPER.endpointHitToStats(hit));
-//        log.info("Hit was create");
+        Statistic statistic = StatisticMapper.mapToStatistic(hit);
+        log.debug("Собрана статистика: {}", statistic);
+        statisticRepository.save(statistic);
     }
 
 
     @Override
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-//        log.info("Get stats by start [{}],\n end [{}],\n uris [{}],\n unique [{}]", start, end, uris, unique);
-//        if (uris == null || uris.isEmpty()) {
-//            if (unique) {
-//                return statisticRepository.getAllUniqueStats(start, end);
-//            } else {
-//                return statisticRepository.getAllStats(start, end);
-//            }
-//        } else {
-//            if (unique) {
-//                return statisticRepository.getUniqueStatsByUris(start, end, uris);
-//            } else {
-//                return statisticRepository.getStatsByUris(start, end, uris);
-//            }
-//        }
+        log.debug("Получен запрос с параметрами: {} {} {} {}", start, end, uris, unique);
+        if (uris == null || uris.isEmpty()) {
+            if (unique) {
+                return statisticRepository.getAllUniqueStats(start, end);
+            } else {
+                return statisticRepository.getAllStats(start, end);
+            }
+        } else {
+            if (unique) {
+                return statisticRepository.getUniqueStatsByUris(start, end, uris);
+            } else {
+                return statisticRepository.getStatsByUris(start, end, uris);
+            }
+        }
     }
 }
