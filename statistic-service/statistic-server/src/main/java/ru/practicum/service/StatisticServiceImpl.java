@@ -24,25 +24,26 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public void saveHit(EndpointHit hit) {
         Statistic statistic = StatisticMapper.mapToStatistic(hit);
-        log.debug("Собрана статистика: {}", statistic);
-        statisticRepository.save(statistic);
+
+        Statistic saveStatistic = statisticRepository.save(statistic);
+        log.debug("Собрана статистика: {}", saveStatistic);
     }
 
 
     @Override
-    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+    public List<ViewStats> getStatistic(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         log.debug("Получен запрос с параметрами: {} {} {} {}", start, end, uris, unique);
         if (uris == null || uris.isEmpty()) {
             if (unique) {
-                return statisticRepository.getAllUniqueStats(start, end);
+                return statisticRepository.getAllUniqueStatistic(start, end);
             } else {
-                return statisticRepository.getAllStats(start, end);
+                return statisticRepository.getAllStatistic(start, end);
             }
         } else {
             if (unique) {
-                return statisticRepository.getUniqueStatsByUris(start, end, uris);
+                return statisticRepository.getUniqueStatisticByUris(start, end, uris);
             } else {
-                return statisticRepository.getStatsByUris(start, end, uris);
+                return statisticRepository.getStatisticByUris(start, end, uris);
             }
         }
     }

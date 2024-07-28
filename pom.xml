@@ -15,7 +15,8 @@
         <module>statistic-service</module>
 		<module>statistic-service/statistic-server</module>
 		<module>statistic-service/statistic-dto</module>
-	</modules>
+        <module>statistic-service/statistic-client</module>
+    </modules>
 
     <groupId>ru.practicum</groupId>
 	<artifactId>explore-with-me</artifactId>

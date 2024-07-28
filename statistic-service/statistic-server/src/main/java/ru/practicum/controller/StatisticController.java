@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHit;
@@ -15,27 +15,29 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.helpers.Constants.FORMAT;
+
 @Validated
 @RestController
 @RequiredArgsConstructor
 public class StatisticController {
-    private final StatisticService statsService;
+    private final StatisticService statisticService;
     private final Logger log = LoggerFactory.getLogger(StatisticController.class);
-    private static final String FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @PostMapping("/hit")
+    @ResponseStatus(HttpStatus.CREATED)
     public void saveHit(@Valid @RequestBody EndpointHit hit) {
         log.info("Получена статистика: {}", hit);
-        statsService.saveHit(hit);
+        statisticService.saveHit(hit);
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<List<ViewStats>> getStats(@RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime start,
-                                                    @RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime end,
-                                                    @RequestParam(required = false) List<String> uris,
-                                                    @RequestParam(defaultValue = "false") Boolean unique) {
+    public List<ViewStats> getStatistic(@RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime start,
+                                        @RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime end,
+                                        @RequestParam List<String> uris,
+                                        @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Получен запрос на получение статистики");
 
-        return null;
+        return statisticService.getStatistic(start, end, uris, unique);
     }
 }

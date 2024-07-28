@@ -1,32 +1,38 @@
 package ru.practicum.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import java.time.LocalDateTime;
 
-@Data
 @Entity
+@Table(name = "STATISTICS", schema = "PUBLIC")
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Statistic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
-    @Column(length = 60)
-    private String app;
+    @Column(name = "APP", length = 60)
+    String app;
 
-    @Column(length = 200)
-    private String uri;
+    @Column(name = "URI", length = 200)
+    String uri;
 
-    @Column(length = 60)
-    private String ip;
+    @Column(name = "IP", length = 60)
+    String ip;
 
     @Column(name = "time_stamp")
-    private LocalDateTime timestamp;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    LocalDateTime timestamp;
 }
