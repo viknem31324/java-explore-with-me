@@ -10,11 +10,12 @@ import ru.practicum.mapper.StatisticMapper;
 import ru.practicum.model.Statistic;
 import ru.practicum.repository.StatisticRepository;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class StatisticServiceImpl implements StatisticService {
     private final StatisticRepository statisticRepository;
@@ -24,7 +25,6 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public void saveHit(EndpointHit hit) {
         Statistic statistic = StatisticMapper.mapToStatistic(hit);
-
         Statistic saveStatistic = statisticRepository.save(statistic);
         log.debug("Собрана статистика: {}", saveStatistic);
     }
@@ -33,18 +33,19 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public List<ViewStats> getStatistic(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         log.debug("Получен запрос с параметрами: {} {} {} {}", start, end, uris, unique);
-        if (uris == null || uris.isEmpty()) {
-            if (unique) {
-                return statisticRepository.getAllUniqueStatistic(start, end);
-            } else {
-                return statisticRepository.getAllStatistic(start, end);
-            }
-        } else {
-            if (unique) {
-                return statisticRepository.getUniqueStatisticByUris(start, end, uris);
-            } else {
-                return statisticRepository.getStatisticByUris(start, end, uris);
-            }
-        }
+//        if (uris == null || uris.isEmpty()) {
+//            if (unique) {
+//                return statisticRepository.getAllUniqueStatistic(start, end);
+//            } else {
+//                return statisticRepository.getAllStatistic(start, end);
+//            }
+//        } else {
+//            if (unique) {
+//                return statisticRepository.getUniqueStatisticByUris(start, end, uris);
+//            } else {
+//                return statisticRepository.getStatisticByUris(start, end, uris);
+//            }
+//        }
+        return null;
     }
 }

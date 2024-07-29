@@ -13,11 +13,12 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "STATISTICS", schema = "PUBLIC")
+@Table(name = "STATISTICS")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Statistic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +33,7 @@ public class Statistic {
     @Column(name = "IP", length = 60)
     String ip;
 
-    @Column(name = "time_stamp")
+    @Column(name = "TIME_STATISTIC")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime timestamp;
 }
