@@ -33,19 +33,18 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public List<ViewStats> getStatistic(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         log.debug("Получен запрос с параметрами: {} {} {} {}", start, end, uris, unique);
-//        if (uris == null || uris.isEmpty()) {
-//            if (unique) {
-//                return statisticRepository.getAllUniqueStatistic(start, end);
-//            } else {
-//                return statisticRepository.getAllStatistic(start, end);
-//            }
-//        } else {
-//            if (unique) {
-//                return statisticRepository.getUniqueStatisticByUris(start, end, uris);
-//            } else {
-//                return statisticRepository.getStatisticByUris(start, end, uris);
-//            }
-//        }
-        return null;
+        if (uris == null || uris.isEmpty()) {
+            if (unique) {
+                return statisticRepository.getAllUniqueStatistic(start, end);
+            } else {
+                return statisticRepository.getAllStatistic(start, end);
+            }
+        } else {
+            if (unique) {
+                return statisticRepository.getUniqueStatisticByUris(start, end, uris);
+            } else {
+                return statisticRepository.getStatisticByUris(start, end, uris);
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ public class StatisticController {
     @GetMapping("/stats")
     public List<ViewStats> getStatistic(@RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime start,
                                         @RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime end,
-                                        @RequestParam List<String> uris,
+                                        @RequestParam(required = false) List<String> uris,
                                         @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Получен запрос на получение статистики");
 

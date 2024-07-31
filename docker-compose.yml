@@ -6,10 +6,12 @@ services:
     container_name: statistic-service-container
     ports:
       - "9090:9090"
+      - "9091:9091"
     depends_on:
       - statistic-db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://statistic-db:5432/statistic-db
+      - WEB_PORT=9090
 
   statistic-db:
     image: postgres:14-alpine
