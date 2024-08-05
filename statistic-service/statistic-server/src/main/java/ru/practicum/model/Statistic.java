@@ -22,18 +22,18 @@ import java.time.LocalDateTime;
 public class Statistic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "APP", length = 60)
-    String app;
+    private String app;
 
     @Column(name = "URI", length = 200)
-    String uri;
+    private String uri;
 
     @Column(name = "IP", length = 60)
-    String ip;
+    private String ip;
 
     @Column(name = "TIME_STATISTIC")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 }

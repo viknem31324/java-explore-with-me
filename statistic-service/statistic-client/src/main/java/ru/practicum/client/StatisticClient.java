@@ -38,7 +38,7 @@ public class StatisticClient {
         Map<String, Object> parameters = Map.of(
                 "start", start.format(formatter),
                 "end", end.format(formatter),
-                "uris", uris,
+                "uris", String.join(",", uris),
                 "unique", unique
         );
         return rest.exchange("/stats?start={start}&end={end}&uris={uris}&unique={unique}", HttpMethod.GET,

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHit;
 import ru.practicum.dto.ViewStats;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import static ru.practicum.helpers.Constants.FORMAT;
 
-@Validated
 @RestController
 @RequiredArgsConstructor
 public class StatisticController {
