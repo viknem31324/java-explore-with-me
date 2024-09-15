@@ -14,8 +14,6 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.helpers.Constants.FORMAT;
-
 @RestController
 @RequiredArgsConstructor
 public class StatisticController {
