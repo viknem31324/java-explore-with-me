@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +23,6 @@ import ru.practicum.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.request.dto.ParticipationRequestDto;
 import ru.practicum.request.service.RequestService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -31,6 +31,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/events")
+@Validated
 public class PrivateEventController {
     private final EventService eventService;
     private final RequestService requestService;
@@ -53,7 +54,7 @@ public class PrivateEventController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable Long userId,
-                               @Valid @RequestBody NewEventDto newEventDto) {
+                               @Validated @RequestBody NewEventDto newEventDto) {
         log.info("Получен запрос на создание нового события");
         return eventService.createEventByUser(userId, newEventDto);
     }
@@ -61,7 +62,7 @@ public class PrivateEventController {
     @PatchMapping("/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long userId,
                                @PathVariable Long eventId,
-                               @Valid @RequestBody UpdateEventUserRequest userRequest) {
+                               @Validated @RequestBody UpdateEventUserRequest userRequest) {
         log.info("Получен запрос на обновление события");
         return eventService.updatePrivateEventByUser(userId, eventId, userRequest);
     }
