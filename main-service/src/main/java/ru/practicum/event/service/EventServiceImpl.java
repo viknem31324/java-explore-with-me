@@ -129,7 +129,6 @@ public class EventServiceImpl implements EventService {
                 start,
                 end,
                 pageable);
-        
         List<Event> eventList = setViewsAndConfirmedRequests(events);
 
         if (sort != null && sort.equals(VIEWS)) {
@@ -148,7 +147,6 @@ public class EventServiceImpl implements EventService {
         }
 
         List<EndpointHit> endpointHitList = new ArrayList<>();
-                
         findEvents.forEach(item -> {
             EndpointHit endpointHit = EndpointHit.builder()
                     .app(APP_NAME)
