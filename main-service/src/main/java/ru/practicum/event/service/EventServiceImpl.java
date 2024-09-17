@@ -151,7 +151,7 @@ public class EventServiceImpl implements EventService {
             EndpointHit endpointHit = EndpointHit.builder()
                     .app(APP_NAME)
                     .ip(request.getRemoteAddr())
-                    .uri(request.getRequestURI() + "/" + item.getId())
+                    .uri(request.getRequestURI())
                     .timestamp(CURRENT_TIME)
                     .build();
             endpointHitList.add(endpointHit);
@@ -176,7 +176,7 @@ public class EventServiceImpl implements EventService {
         EndpointHit endpointHit = EndpointHit.builder()
                 .app(APP_NAME)
                 .ip(request.getRemoteAddr())
-                .uri(request.getRequestURI() + "/" + event.getId())
+                .uri(request.getRequestURI())
                 .timestamp(CURRENT_TIME)
                 .build();
         statisticClient.saveHit(endpointHit);
