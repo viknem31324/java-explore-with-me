@@ -47,15 +47,4 @@ public class ErrorHandler {
                 LocalDateTime.now().format(formatter)
         );
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError handleThrowable(final Throwable e) {
-        return new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "Произошла непредвиденная ошибка.",
-                e.getMessage(),
-                LocalDateTime.now().format(formatter)
-        );
-    }
 }
