@@ -170,7 +170,7 @@ public class EventServiceImpl implements EventService {
         Event event = checkExistence.getEvent(id);
 
         if (event.getState() != State.PUBLISHED) {
-            throw new NotFoundException(String.format("Событие с id %d пока не опубликовано", event.getId()));
+            throw new NotFoundException(String.format("Событие с id %d пока не опубликовано.", event.getId()));
         }
 
         EndpointHit endpointHit = EndpointHit.builder()
