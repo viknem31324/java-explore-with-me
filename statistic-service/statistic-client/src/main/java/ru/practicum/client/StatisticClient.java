@@ -20,7 +20,7 @@ import java.util.Map;
 @Service
 public class StatisticClient {
     protected final RestTemplate rest;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatisticClient(@Value("${statistic-server.url}") String serverUrl, RestTemplateBuilder builder) {
         this.rest = builder
