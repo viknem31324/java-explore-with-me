@@ -45,4 +45,15 @@ public class StatisticClient {
                 null, new ParameterizedTypeReference<List<ViewStats>>() {
                 }, parameters).getBody();
     }
+
+    public List<ViewStats> getStatistic(List<String> uris, Boolean unique) {
+        Map<String, Object> parameters = Map.of(
+                "start", LocalDateTime.now().minusYears(5).format(formatter),
+                "end", LocalDateTime.now().plusYears(5).format(formatter),
+                "uris", String.join(",", uris),
+                "unique", unique
+        );
+        return rest.exchange("/stats?start={start}&end={end}&uris={uris}&unique={unique}", HttpMethod.GET,
+                null, new ParameterizedTypeReference<List<ViewStats>>(){}, parameters).getBody();
+    }
 }
