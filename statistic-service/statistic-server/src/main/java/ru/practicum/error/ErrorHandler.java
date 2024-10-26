@@ -5,11 +5,11 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.error.exeption.ValidationException;
+import ru.practicum.error.exeption.RequestException;
 
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler({ ValidationException.class, MissingServletRequestParameterException.class })
+    @ExceptionHandler({ RequestException.class, MissingServletRequestParameterException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleBadRequestException(final RuntimeException e) {
         return new ExceptionResponse(e.getMessage());

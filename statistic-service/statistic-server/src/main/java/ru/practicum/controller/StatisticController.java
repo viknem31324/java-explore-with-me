@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHit;
 import ru.practicum.dto.ViewStats;
-import ru.practicum.error.exeption.ValidationException;
+import ru.practicum.error.exeption.RequestException;
 import ru.practicum.service.StatisticService;
 
 import javax.validation.Valid;
@@ -36,7 +36,7 @@ public class StatisticController {
                                         @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Получен запрос на получение статистики: дата старта - {}, дата конца - {}", start, end);
         if (start.isAfter(end)) {
-            throw new ValidationException("Неверные даты!");
+            throw new RequestException("Неверные даты!");
         }
         return statisticService.getStatistic(start, end, uris, unique);
     }
