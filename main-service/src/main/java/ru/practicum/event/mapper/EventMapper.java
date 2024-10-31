@@ -12,8 +12,6 @@ import ru.practicum.event.model.Event;
 public interface EventMapper {
     EventMapper EVENT_MAPPER = Mappers.getMapper(EventMapper.class);
 
-    Event toEvent(EventFullDto eventFullDto);
-
     @Mapping(source = "category", target = "category.id")
     Event toEvent(NewEventDto newEventDto);
 

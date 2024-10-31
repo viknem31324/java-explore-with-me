@@ -47,4 +47,15 @@ public class ErrorHandler {
                 LocalDateTime.now().format(formatter)
         );
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handlerInternalException(final RuntimeException e) {
+        return new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "Internal server error.",
+                e.getMessage(),
+                LocalDateTime.now().format(formatter)
+        );
+    }
 }

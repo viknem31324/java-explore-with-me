@@ -33,7 +33,7 @@ public class UserController {
     public ResponseEntity<List<UserDto>> get(@RequestParam(required = false) List<Long> ids,
                                              @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                              @Positive @RequestParam(defaultValue = "10") int size) {
-        log.info("Запрос о существующий пользователях с id: {}, c {}, по {} польхователя", ids, from, size);
+        log.info("Запрос о существующий пользователях с id: {}, c {}, по {} пользователя", ids, from, size);
         return new ResponseEntity<>(userService.getUsers(ids, from, size), HttpStatus.OK);
     }
 
