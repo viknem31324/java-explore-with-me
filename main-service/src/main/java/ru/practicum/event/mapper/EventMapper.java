@@ -15,7 +15,8 @@ public interface EventMapper {
     @Mapping(source = "category", target = "category.id")
     Event toEvent(NewEventDto newEventDto);
 
-    EventFullDto toEventFullDto(Event event);
+    @Mapping(target = "views", source = "hits")
+    EventFullDto toEventFullDto(Event event, Long hits);
 
     EventShortDto toEventShortDto(Event event);
 }

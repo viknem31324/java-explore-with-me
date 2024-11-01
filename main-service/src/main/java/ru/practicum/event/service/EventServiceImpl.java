@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static ru.practicum.event.enums.Sort.VIEWS;
 import static ru.practicum.event.mapper.EventMapper.EVENT_MAPPER;
 import static ru.practicum.util.Constant.*;
 
@@ -54,15 +53,21 @@ public class EventServiceImpl implements EventService {
     public List<EventFullDto> findAllEventsByAdmin(List<Long> users, List<State> states, List<Long> categories,
                                                    LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                    Pageable pageable) {
+        Map<Long, Long> views;
         List<EventFullDto> findEvents;
+        
         if (states == null && rangeStart == null && rangeEnd == null) {
-            findEvents = eventRepository.findAll(pageable)
+            List<Event> events = eventRepository.findAll(pageable).stream().toList();
+            views = getViewsForEvents(events);
+                  
+            findEvents = events
                     .stream()
-                    .map(EVENT_MAPPER::toEventFullDto)
+                    .map(item -> EVENT_MAPPER.toEventFullDto(item, views.get(item.getId())))
                     .collect(toList());
             log.debug("Найдены события: {}", findEvents);
             return findEvents;
         }
+
         if (states == null) {
             states = Stream.of(State.values()).collect(toList());
         }
@@ -72,8 +77,10 @@ public class EventServiceImpl implements EventService {
 
         checkExistence.getDateTime(rangeStart, rangeEnd);
         List<Event> events = eventRepository.findByParams(users, states, categories, rangeStart, rangeEnd, pageable);
+        views = getViewsForEvents(events);
+        
         findEvents = events.stream()
-                .map(EVENT_MAPPER::toEventFullDto)
+                .map(item -> EVENT_MAPPER.toEventFullDto(item, views.get(item.getId())))
                 .collect(toList());
         log.debug("Найдены события: {}", findEvents);
         return findEvents;
@@ -101,7 +108,10 @@ public class EventServiceImpl implements EventService {
                     break;
             }
         }
-        EventFullDto updatedEvent = EVENT_MAPPER.toEventFullDto(eventRepository.save(updateEvent(event, request)));
+        
+        Event currentEvent = eventRepository.save(updateEvent(event, request));
+        Long views = getViewsForEvent(currentEvent);
+        EventFullDto updatedEvent = EVENT_MAPPER.toEventFullDto(currentEvent, views);
         log.debug("Обновленное событие: {}", updatedEvent);
         return updatedEvent;
     }
@@ -129,11 +139,7 @@ public class EventServiceImpl implements EventService {
                 start,
                 end,
                 pageable);
-        List<Event> eventList = setViewsAndConfirmedRequests(events);
-
-        if (sort != null && sort.equals(VIEWS)) {
-            eventList.sort((e1, e2) -> e2.getViews().compareTo(e1.getViews()));
-        }
+        List<Event> eventList = confirmedRequests(events);
 
         if (onlyAvailable) {
             findEvents = eventList.stream()
@@ -184,13 +190,12 @@ public class EventServiceImpl implements EventService {
         List<ViewStats> viewStatsList = statisticClient.getStatistic(List.of("/events/" + id.toString()), true);
         long hits = viewStatsList.stream()
                 .filter(s -> Objects.equals(s.getUri(), (request.getRequestURI() + "/" + event.getId())))
-                .count();
-
-        event.setViews(hits + 1);
+                .count() + 1;
 
         event.setConfirmedRequests((long) requestRepository.findAllByEventIdInAndStatus(List.of(id),
                 RequestStatus.CONFIRMED).size());
-        return EVENT_MAPPER.toEventFullDto(eventRepository.save(event));
+        Event currentEvent = eventRepository.save(event);
+        return EVENT_MAPPER.toEventFullDto(currentEvent, hits);
     }
 
     @Override
@@ -211,7 +216,8 @@ public class EventServiceImpl implements EventService {
 
         event.setCategory(category);
         event.setInitiator(user);
-        EventFullDto eventSaved = EVENT_MAPPER.toEventFullDto(eventRepository.save(event));
+        Event currentEvent = eventRepository.save(event);
+        EventFullDto eventSaved = EVENT_MAPPER.toEventFullDto(currentEvent, 0L);
         log.debug("Создано новое событие: {}", eventSaved);
         return eventSaved;
     }
@@ -219,9 +225,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventFullDto> findPrivateAllEventsByUser(Long userId, Pageable pageable) {
         checkExistence.getUser(userId);
-        List<EventFullDto> listEvents = eventRepository.findAllByInitiatorId(userId, pageable)
+        List<Event> events = eventRepository.findAllByInitiatorId(userId, pageable);
+        Map<Long, Long> views = getViewsForEvents(events);
+        
+        List<EventFullDto> listEvents = events
                 .stream()
-                .map(EVENT_MAPPER::toEventFullDto)
+                .map(item -> EVENT_MAPPER.toEventFullDto(item, views.get(item.getId())))
                 .collect(toList());
         log.debug("Найдены события: {}", listEvents);
         return listEvents;
@@ -233,7 +242,8 @@ public class EventServiceImpl implements EventService {
         User user = checkExistence.getUser(userId);
 
         checkEventOwner(event, user);
-        EventFullDto findEvent = EVENT_MAPPER.toEventFullDto(event);
+        Long views = getViewsForEvent(event);
+        EventFullDto findEvent = EVENT_MAPPER.toEventFullDto(event, views);
         log.debug("Найдено событие: {}", findEvent);
         return findEvent;
     }
@@ -253,8 +263,10 @@ public class EventServiceImpl implements EventService {
         if (StateAction.CANCEL_REVIEW == request.getStateAction()) {
             event.setState(State.CANCELED);
         }
-
-        EventFullDto updatedEvent = EVENT_MAPPER.toEventFullDto(eventRepository.save(updateEvent(event, request)));
+        
+        Event currentEvent = eventRepository.save(updateEvent(event, request));
+        Long views = getViewsForEvent(currentEvent);
+        EventFullDto updatedEvent = EVENT_MAPPER.toEventFullDto(currentEvent, views);
         log.debug("Обновлено событие: {}", updatedEvent);
         return updatedEvent;
     }
@@ -263,7 +275,31 @@ public class EventServiceImpl implements EventService {
         return constructEvent(event, request);
     }
 
-    private List<Event> setViewsAndConfirmedRequests(List<Event> events) {
+    private List<Event> confirmedRequests(List<Event> events) {
+        List<Long> numberEvents = events
+                .stream()
+                .map(Event::getId)
+                .collect(toList());
+
+        events.forEach(event -> event.setConfirmedRequests((long) requestRepository.findAllByEventIdInAndStatus(
+                        new ArrayList<>(numberEvents), RequestStatus.CONFIRMED).size()));
+
+        return events.stream()
+                .map(eventRepository::save)
+                .collect(toList());
+    }
+
+    private Long getViewsForEvent(Event event) {
+        Long eventId = event.getId();
+        List<String> eventIds = List.of("/events/" + eventId);
+        List<ViewStats> viewStatsList = statisticClient.getStatistic(eventIds, false);
+        if (!viewStatsList.isEmpty()) {
+            return viewStatsList.getFirst().getHits();
+        }
+        return 0L;
+    }
+
+    private Map<Long, Long> getViewsForEvents(List<Event> events) {
         List<Long> numberEvents = events
                 .stream()
                 .map(Event::getId)
@@ -273,22 +309,13 @@ public class EventServiceImpl implements EventService {
                 .collect(toList());
 
         List<ViewStats> viewStatsList = statisticClient.getStatistic(eventIds, false);
-        Map<Long, Long> views;
+  
         if (viewStatsList != null && !viewStatsList.isEmpty()) {
-            views = viewStatsList.stream()
+            return viewStatsList.stream()
                     .collect(Collectors.toMap(this::getEventIdFromURI, ViewStats::getHits));
-        } else {
-            views = Collections.emptyMap();
         }
-
-        events.forEach(event -> event.setViews(views.getOrDefault(event.getId(), 0L)));
-
-        events.forEach(event -> event.setConfirmedRequests((long) requestRepository.findAllByEventIdInAndStatus(
-                        new ArrayList<>(numberEvents), RequestStatus.CONFIRMED).size()));
-
-        return events.stream()
-                .map(eventRepository::save)
-                .collect(toList());
+        
+        return Collections.emptyMap();
     }
 
     private Long getEventIdFromURI(ViewStats viewStats) {
