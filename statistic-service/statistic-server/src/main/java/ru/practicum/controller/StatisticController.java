@@ -8,17 +8,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHit;
 import ru.practicum.dto.ViewStats;
+import ru.practicum.error.exeption.RequestException;
 import ru.practicum.service.StatisticService;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.helpers.Constants.FORMAT;
-
 @RestController
 @RequiredArgsConstructor
 public class StatisticController {
+    public static final String FORMATTER = "yyyy-MM-dd HH:mm:ss";
     private final StatisticService statisticService;
     private final Logger log = LoggerFactory.getLogger(StatisticController.class);
 
@@ -30,12 +30,14 @@ public class StatisticController {
     }
 
     @GetMapping("/stats")
-    public List<ViewStats> getStatistic(@RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime start,
-                                        @RequestParam @DateTimeFormat(pattern = FORMAT) LocalDateTime end,
+    public List<ViewStats> getStatistic(@RequestParam @Valid @DateTimeFormat(pattern = FORMATTER) LocalDateTime start,
+                                        @RequestParam @Valid @DateTimeFormat(pattern = FORMATTER) LocalDateTime end,
                                         @RequestParam(required = false) List<String> uris,
                                         @RequestParam(defaultValue = "false") Boolean unique) {
-        log.info("Получен запрос на получение статистики");
-
+        log.info("Получен запрос на получение статистики: дата старта - {}, дата конца - {}", start, end);
+        if (start.isAfter(end)) {
+            throw new RequestException("Неверные даты!");
+        }
         return statisticService.getStatistic(start, end, uris, unique);
     }
 }
