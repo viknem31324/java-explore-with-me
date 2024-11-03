@@ -55,11 +55,9 @@ public class EventServiceImpl implements EventService {
                                                    Pageable pageable) {
         Map<Long, Long> views;
         List<EventFullDto> findEvents;
-        
         if (states == null && rangeStart == null && rangeEnd == null) {
             List<Event> events = eventRepository.findAll(pageable).stream().toList();
             views = getViewsForEvents(events);
-                  
             findEvents = events
                     .stream()
                     .map(item -> EVENT_MAPPER.toEventFullDto(item, views.get(item.getId())))
@@ -78,7 +76,6 @@ public class EventServiceImpl implements EventService {
         checkExistence.getDateTime(rangeStart, rangeEnd);
         List<Event> events = eventRepository.findByParams(users, states, categories, rangeStart, rangeEnd, pageable);
         views = getViewsForEvents(events);
-        
         findEvents = events.stream()
                 .map(item -> EVENT_MAPPER.toEventFullDto(item, views.get(item.getId())))
                 .collect(toList());
@@ -108,7 +105,6 @@ public class EventServiceImpl implements EventService {
                     break;
             }
         }
-        
         Event currentEvent = eventRepository.save(updateEvent(event, request));
         Long views = getViewsForEvent(currentEvent);
         EventFullDto updatedEvent = EVENT_MAPPER.toEventFullDto(currentEvent, views);
@@ -227,7 +223,6 @@ public class EventServiceImpl implements EventService {
         checkExistence.getUser(userId);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageable);
         Map<Long, Long> views = getViewsForEvents(events);
-        
         List<EventFullDto> listEvents = events
                 .stream()
                 .map(item -> EVENT_MAPPER.toEventFullDto(item, views.get(item.getId())))
@@ -256,14 +251,12 @@ public class EventServiceImpl implements EventService {
         checkEventOwner(event, user);
         checkEventStatus(event, request, List.of(State.PENDING, State.CANCELED));
         checkDate(request);
-
         if (StateAction.SEND_TO_REVIEW == request.getStateAction()) {
             event.setState(State.PENDING);
         }
         if (StateAction.CANCEL_REVIEW == request.getStateAction()) {
             event.setState(State.CANCELED);
         }
-        
         Event currentEvent = eventRepository.save(updateEvent(event, request));
         Long views = getViewsForEvent(currentEvent);
         EventFullDto updatedEvent = EVENT_MAPPER.toEventFullDto(currentEvent, views);
@@ -307,14 +300,12 @@ public class EventServiceImpl implements EventService {
         List<String> eventIds = numberEvents.stream()
                 .map(item -> "/events/" + item)
                 .collect(toList());
-
         List<ViewStats> viewStatsList = statisticClient.getStatistic(eventIds, false);
-  
         if (viewStatsList != null && !viewStatsList.isEmpty()) {
             return viewStatsList.stream()
                     .collect(Collectors.toMap(this::getEventIdFromURI, ViewStats::getHits));
         }
-        
+
         return Collections.emptyMap();
     }
 
