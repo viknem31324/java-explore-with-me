@@ -191,7 +191,9 @@ public class EventServiceImpl implements EventService {
         event.setConfirmedRequests((long) requestRepository.findAllByEventIdInAndStatus(List.of(id),
                 RequestStatus.CONFIRMED).size());
         Event currentEvent = eventRepository.save(event);
-        return EVENT_MAPPER.toEventFullDto(currentEvent, hits);
+        EventFullDto eventFullDto = EVENT_MAPPER.toEventFullDto(currentEvent, hits);
+        eventFullDto.setComments(checkExistence.getCommentsCount(id));
+        return eventFullDto;
     }
 
     @Override
